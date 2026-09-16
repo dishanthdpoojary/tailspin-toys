@@ -24,6 +24,38 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by categories and publisher', async ({ page }) => {
+    await test.step('Navigate to homepage', async () => {
+      await page.goto('/');
+      await expect(page.getByTestId('games-grid')).toBeVisible();
+    });
+
+    await test.step('Filter by multiple categories', async () => {
+      await page.getByLabel('Strategy').check();
+      await page.getByLabel('Puzzle').check();
+
+      const visibleCards = page.locator('[data-testid="game-card"]:not([hidden])');
+      await expect(visibleCards).toHaveCount(8);
+      await expect(page.getByTestId('filter-results')).toHaveText('Showing 8 games');
+    });
+
+    await test.step('Combine category and publisher filters', async () => {
+      await page.getByLabel('Publisher').selectOption({ label: 'CodeForge Studios' });
+
+      const visibleCards = page.locator('[data-testid="game-card"]:not([hidden])');
+      await expect(visibleCards).toHaveCount(2);
+      await expect(visibleCards.nth(0)).toContainText('Code Puzzle Chronicles');
+      await expect(visibleCards.nth(1)).toContainText('DevOps Dominion');
+    });
+
+    await test.step('Clear filters', async () => {
+      await page.getByTestId('clear-filters').click();
+
+      await expect(page.locator('[data-testid="game-card"]:not([hidden])')).toHaveCount(21);
+      await expect(page.getByTestId('filter-results')).toHaveText('Showing 21 games');
+    });
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
