@@ -40,4 +40,12 @@ export default [
       parser: tseslint.parser,
     },
   },
+  {
+    files: ["**/*.ts"],
+    rules: {
+      quotes: ["error", "single", { avoidEscape: true }],
+      semi: ["error", "always"],
+      "comma-dangle": ["error", "always-multiline"],
+    },
+  },
 ];
